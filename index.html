@@ -2,24 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Audio Prompt Buttons (EN + CY)</title>
+  <title>SAS Audio Prompt Buttons (EN + SV)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
   />
   <style>
-    :root { --brand: #2470B8; }
+    :root { --brand: #0f0066; --ice: #c1e5f5; }
     body { background: #f6f8fb; }
-    .card { background:#fff; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,.10); }
-    .playbtn:focus { outline: 3px solid rgba(36,112,184,.5); outline-offset: 2px; }
-    .pill { background:#eef4fb; color:#0f2f4c; }
+    .card { background:#fff; border-radius:16px; box-shadow:0 10px 25px rgba(15,0,102,.10); }
+    .playbtn:focus { outline: 3px solid rgba(193,229,245,.9); outline-offset: 2px; }
+    .pill { background: var(--ice); color: var(--brand); }
+    .header { background: var(--brand); }
+    .btn { background: var(--brand); }
+    .btn:hover { filter: brightness(1.05); }
   </style>
 </head>
 <body class="min-h-screen">
-  <header class="bg-blue-700 text-white px-5 py-5">
-    <h1 class="text-2xl font-semibold">Welsh Audio Prompts</h1>
-    <p class="opacity-90 text-sm">Click any button to play its audio file.</p>
+  <header class="header text-white px-5 py-5">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-2xl font-semibold">SAS Swedish Audio Prompts</h1>
+      <p class="opacity-90 text-sm">Click any button to play its audio file.</p>
+    </div>
   </header>
 
   <main class="max-w-3xl mx-auto px-4 py-6 space-y-4">
@@ -38,67 +43,80 @@
 
   <script>
     // 1) Put your audio file URLs here (MP3, WAV, etc.)
-    //    Replace the example.com links with your real URLs.
+    //    Replace the placeholder URLs with your real SAS Swedish files later.
     const AUDIO_URLS = {
-      helloNewClaim: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/Start Claim (Welsh Statements).mp3",
-      claimUniversalCredit: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/Universal Credit (Welsh Statements).mp3",
-      myNameDaniel: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/First Name (Welsh Statements).mp3",
-      itsWoodward: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/Last Name (Welsh Statements).mp3",
-      dateDob: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/Date of Birth (Welsh Statements).mp3",
-      jtCode: "https://emeaazurestorageaccount.blob.core.windows.net/uk-gtm/Welsh Audio/National Insurance (Welsh Statements).mp3"
+      bookingIssueBerlinStockholm: "./bookingIssueBerlinStockholm.wav",
+      soundsGood: "./soundsGood.wav",
+      yes: "./yes.wav",
+      sure: "./sure.wav",
+      readyLetsGo: "./readyLetsGo.wav",
+      preferAfternoon: "./preferAfternoon.wav",
+      noThatsGood: "./noThatsGood.wav",
+      greatThankYou: "./greatThankYou.wav"
     };
 
-    // 2) Content (English + Welsh)
+    // 2) Content (English + Swedish)
     const ROWS = [
       {
-        key: "helloNewClaim",
-        en: "Hello, I want to start a new claim",
-        cy: "Helo, hoffwn ddechrau hawliad newydd."
+        key: "bookingIssueBerlinStockholm",
+        en: "I could not complete my booking on the website, it wouldn't let me select flights. I want to book Berlin to Stockholm, on February 10th, returning February 15th",
+        sv: "Jag kunde inte slutföra min bokning på webbplatsen, den lät mig inte välja flyg. Jag vill boka Berlin till Stockholm den tionde februari och resa tillbaka den femtonde februari."
       },
       {
-        key: "claimUniversalCredit",
-        en: "I want to claim for Universal Credit",
-        cy: "Hoffwn hawlio Credyd Cynhwysol."
+        key: "soundsGood",
+        en: "Sounds good.",
+        sv: "Låter bra."
       },
       {
-        key: "myNameDaniel",
-        en: "My name is Daniel",
-        cy: "Fy enw i yw Daniel."
+        key: "yes",
+        en: "Yes",
+        sv: "Ja."
       },
       {
-        key: "itsWoodward",
-        en: "It's Woodward",
-        cy: "Mae’n Woodward."
+        key: "sure",
+        en: "Sure",
+        sv: "Visst."
       },
       {
-        key: "dateDob",
-        en: "It's the third of June nineteen eighty nine",
-        cy: "Y trydydd o Fehefin, mil naw cant wyth deg naw."
+        key: "readyLetsGo",
+        en: "I am ready let's go",
+        sv: "Jag är redo, kör vi."
       },
       {
-        key: "jtCode",
-        en: "its J T eight one one five seven zero C",
-        cy: "Mae’n J T wyth un un pump saith sero C."
+        key: "preferAfternoon",
+        en: "I prefere afternoon",
+        sv: "Jag föredrar eftermiddagen."
+      },
+      {
+        key: "noThatsGood",
+        en: "No, I think that is good for now",
+        sv: "Nej, jag tror att det räcker för tillfället."
+      },
+      {
+        key: "greatThankYou",
+        en: "Great! Thank you, have a great day!",
+        sv: "Toppen. Tack så mycket, ha en fortsatt trevlig dag."
       }
     ];
 
     // Build UI
     const list = document.getElementById("list");
-    ROWS.forEach(({ key, en, cy }) => {
+    ROWS.forEach(({ key, en, sv }) => {
       const row = document.createElement("div");
-      row.className = "card p-4 flex items-start justify-between";
+      row.className = "card p-4 flex items-start justify-between gap-4";
 
       const left = document.createElement("div");
-      left.className = "flex-1 pr-3";
+      left.className = "flex-1";
+
       const btn = document.createElement("button");
-      btn.className = "playbtn w-full sm:w-auto px-4 py-3 rounded font-semibold bg-blue-600 text-white hover:bg-blue-700 transition";
+      btn.className = "playbtn btn w-full sm:w-auto px-4 py-3 rounded font-semibold text-white transition";
       btn.textContent = en;
       btn.setAttribute("data-key", key);
       btn.setAttribute("aria-label", `Play: ${en}`);
 
       const right = document.createElement("div");
-      right.className = "text-sm text-gray-700 mt-3 sm:mt-0 sm:ml-4 sm:self-center";
-      right.textContent = cy;
+      right.className = "text-sm text-gray-700 mt-3 sm:mt-0 sm:ml-4 sm:self-center sm:text-right max-w-md";
+      right.textContent = sv;
 
       left.appendChild(btn);
       row.appendChild(left);
@@ -118,6 +136,7 @@
     list.addEventListener("click", (e) => {
       const btn = e.target.closest("button.playbtn");
       if (!btn) return;
+
       const key = btn.getAttribute("data-key");
       const url = AUDIO_URLS[key];
 
@@ -126,10 +145,10 @@
         return;
       }
 
-      // Load and play
       player.pause();
       player.src = url;
       player.currentTime = 0;
+
       player.play()
         .then(() => setStatus(`Playing: ${btn.textContent}`))
         .catch(err => {
