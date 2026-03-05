@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Swedbank Audio Prompt Buttons (EN + SV)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+  />
+  <style>
+    /* Swedbank-ish refresh (simple + clean) */
+    :root { --brand: #ff6a00; --ice: #fff1e6; --ink: #1f2937; }
+    body { background: #f6f8fb; color: var(--ink); }
+    .card { background:#fff; border-radius:16px; box-shadow:0 10px 25px rgba(31,41,55,.10); }
+    .playbtn:focus { outline: 3px solid rgba(255,106,0,.25); outline-offset: 2px; }
+    .pill { background: var(--ice); color: #9a3e00; }
+    .header { background: #111827; } /* dark header with Swedbank orange accents */
+    .btn { background: var(--brand); }
+    .btn:hover { filter: brightness(1.05); }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="header text-white px-5 py-5">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-2xl font-semibold">Swedbank Swedish Audio Prompts</h1>
+      <p class="opacity-90 text-sm">Click any button to play its audio file.</p>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-6 space-y-4">
+    <!-- Rows -->
+    <div id="list" class="space-y-3"></div>
+
+    <!-- Transport + status -->
+    <div class="flex items-center gap-3 pt-4">
+      <button id="stopAll" class="pill px-4 py-2 rounded font-medium">Stop</button>
+      <span id="nowPlaying" class="text-sm text-gray-600">Idle</span>
+    </div>
+  </main>
+
+  <!-- Single shared audio element -->
+  <audio id="player" preload="none"></audio>
+
+  <script>
+    // 1) Audio file URLs (keep naming simple)
+    //    Put these files next to this HTML (or update paths).
+    const AUDIO_URLS = {
+      disputeTransaction: "./01_disputeTransaction.wav",
+      customerNumber: "./02_customerNumber.wav",
+      myNameIsDaniel: "./03_myNameIsDaniel.wav",
+      useBankId: "./04_useBankId.wav",
+      useSmartId: "./05_useSmartId.wav",
+      useOneTimePasscode: "./06_useOneTimePasscode.wav",
+      useSecurityQuestions: "./07_useSecurityQuestions.wav",
+      transactionHmLastTuesday249: "./08_transactionHmLastTuesday249.wav",
+      checkOtherTransactionsGenerateStatement: "./09_checkOtherTransactionsGenerateStatement.wav",
+      last90Days: "./10_last90Days.wav",
+      last30Days: "./11_last30Days.wav",
+      fromToday: "./12_fromToday.wav",
+      circleKFraudLastTuesday1000: "./13_circleKFraudLastTuesday1000.wav",
+      thatsAGoodIdea: "./14_thatsAGoodIdea.wav",
+      blockMyCard: "./15_blockMyCard.wav",
+      myCardWasStolen: "./16_myCardWasStolen.wav",
+      myCardNumber2322: "./17_myCardNumber2322.wav",
+      increaseLimitOtherCardNow: "./18_increaseLimitOtherCardNow.wav",
+      atLeast50000Krona: "./19_atLeast50000Krona.wav",
+      cardNumber3233: "./20_cardNumber3233.wav",
+      yes: "./21_yes.wav",
+      no: "./22_no.wav",
+      concernedPersonalMatterSpeakToSomeone: "./23_concernedPersonalMatterSpeakToSomeone.wav",
+      thankYou: "./24_thankYou.wav"
+    };
+
+    // 2) Content (English + Swedish) — kept in your exact order
+    const ROWS = [
+      {
+        key: "disputeTransaction",
+        en: "I want to dispute a transaction on my account",
+        sv: "Jag vill bestrida en transaktion på mitt konto."
+      },
+      {
+        key: "customerNumber",
+        en: "My customer number is 1 2 3 6 7 4 5 6",
+        sv: "Mitt kundnummer är ett två tre sex sju fyra fem sex."
+      },
+      {
+        key: "myNameIsDaniel",
+        en: "My name is Daniel",
+        sv: "Jag heter Daniel."
+      },
+      {
+        key: "useBankId",
+        en: "Let's use bank ID",
+        sv: "Vi använder BankID."
+      },
+      {
+        key: "useSmartId",
+        en: "Let's use smart ID",
+        sv: "Vi använder Smart ID."
+      },
+      {
+        key: "useOneTimePasscode",
+        en: "Let's use one time passcode",
+        sv: "Vi använder en engångskod."
+      },
+      {
+        key: "useSecurityQuestions",
+        en: "Let's use security questions",
+        sv: "Vi använder säkerhetsfrågor."
+      },
+      {
+        key: "transactionHmLastTuesday249",
+        en: "The transaction was with H&M, last Tuesday, for 249 krona",
+        sv: "Transaktionen var med H och M, i tisdags, på tvåhundrafyrtionio kronor."
+      },
+      {
+        key: "checkOtherTransactionsGenerateStatement",
+        en: "I better check my other transactions, can you generate me a statement?",
+        sv: "Jag behöver nog kolla mina andra transaktioner, kan du ta fram ett kontoutdrag åt mig?"
+      },
+      {
+        key: "last90Days",
+        en: "The last 90 Days",
+        sv: "De senaste nittio dagarna."
+      },
+      {
+        key: "last30Days",
+        en: "The last 30 Days",
+        sv: "De senaste trettio dagarna."
+      },
+      {
+        key: "fromToday",
+        en: "From Today",
+        sv: "Från i dag."
+      },
+      {
+        key: "circleKFraudLastTuesday1000",
+        en: "I see there is another Circle K transaction that looks fraudlent, last Tuesday as well, for 1000 krona, can I raise a fraud investigation?",
+        sv: "Jag ser att det finns en till Circle K-transaktion som ser bedräglig ut, också i tisdags, på ettusen kronor. Kan jag anmäla det som bedrägeri?"
+      },
+      {
+        key: "thatsAGoodIdea",
+        en: "That's a good idea.",
+        sv: "Det är en bra idé."
+      },
+      {
+        key: "blockMyCard",
+        en: "Can you block my card?",
+        sv: "Kan du spärra mitt kort?"
+      },
+      {
+        key: "myCardWasStolen",
+        en: "My card was stolen",
+        sv: "Mitt kort blev stulet."
+      },
+      {
+        key: "myCardNumber2322",
+        en: "My card number is 2322",
+        sv: "Mitt kortnummer är två tre två två."
+      },
+      {
+        key: "increaseLimitOtherCardNow",
+        en: "I need to increase the limit on my other card now.",
+        sv: "Jag behöver höja gränsen på mitt andra kort nu."
+      },
+      {
+        key: "atLeast50000Krona",
+        en: "At least 50,000 krona.",
+        sv: "Minst femtiotusen kronor."
+      },
+      {
+        key: "cardNumber3233",
+        en: "The card number is 3233",
+        sv: "Kortnumret är tre två tre tre."
+      },
+      {
+        key: "yes",
+        en: "Yes",
+        sv: "Ja."
+      },
+      {
+        key: "no",
+        en: "No",
+        sv: "Nej."
+      },
+      {
+        key: "concernedPersonalMatterSpeakToSomeone",
+        en: "I am a bit concerned now, and I have a personal matter, can I speak to someone immediately?",
+        sv: "Jag är lite orolig nu, och jag har ett personligt ärende. Kan jag prata med någon direkt?"
+      },
+      {
+        key: "thankYou",
+        en: "Thank you",
+        sv: "Tack."
+      }
+    ];
+
+    // Build UI
+    const list = document.getElementById("list");
+    ROWS.forEach(({ key, en, sv }) => {
+      const row = document.createElement("div");
+      row.className = "card p-4 flex items-start justify-between gap-4";
+
+      const left = document.createElement("div");
+      left.className = "flex-1";
+
+      const btn = document.createElement("button");
+      btn.className = "playbtn btn w-full sm:w-auto px-4 py-3 rounded font-semibold text-white transition";
+      btn.textContent = en;
+      btn.setAttribute("data-key", key);
+      btn.setAttribute("aria-label", `Play: ${en}`);
+
+      const right = document.createElement("div");
+      right.className = "text-sm text-gray-700 mt-3 sm:mt-0 sm:ml-4 sm:self-center sm:text-right max-w-md";
+      right.textContent = sv;
+
+      left.appendChild(btn);
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    });
+
+    // Audio wiring
+    const player = document.getElementById("player");
+    const nowPlaying = document.getElementById("nowPlaying");
+    const stopAll = document.getElementById("stopAll");
+
+    function setStatus(text) {
+      nowPlaying.textContent = text || "Idle";
+    }
+
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest("button.playbtn");
+      if (!btn) return;
+
+      const key = btn.getAttribute("data-key");
+      const url = AUDIO_URLS[key];
+
+      if (!url) {
+        alert("No audio URL configured for this item. Please update AUDIO_URLS.");
+        return;
+      }
+
+      player.pause();
+      player.src = url;
+      player.currentTime = 0;
+
+      player.play()
+        .then(() => setStatus(`Playing: ${btn.textContent}`))
+        .catch(err => {
+          console.error(err);
+          setStatus("Error playing audio");
+          alert("Could not play the audio. Check the file URL and CORS settings.");
+        });
+    });
+
+    stopAll.addEventListener("click", () => {
+      player.pause();
+      player.currentTime = 0;
+      setStatus("Idle");
+    });
+
+    player.addEventListener("ended", () => setStatus("Idle"));
+  </script>
+</body>
+</html>
