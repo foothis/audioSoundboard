@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Audio Prompt Buttons (EN + SV)</title>
+  <title>Banking Audio Prompt Buttons (EN + SV)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link
     rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
   />
   <style>
-    /* Swedbank-ish refresh (simple + clean) */
     :root { --brand: #ff6a00; --ice: #fff1e6; --ink: #1f2937; }
     body { background: #f6f8fb; color: var(--ink); }
     .card { background:#fff; border-radius:16px; box-shadow:0 10px 25px rgba(31,41,55,.10); }
     .playbtn:focus { outline: 3px solid rgba(255,106,0,.25); outline-offset: 2px; }
     .pill { background: var(--ice); color: #9a3e00; }
-    .header { background: #111827; } /* dark header with Swedbank orange accents */
+    .header { background: #111827; }
     .btn { background: var(--brand); }
     .btn:hover { filter: brightness(1.05); }
   </style>
@@ -29,22 +28,18 @@
   </header>
 
   <main class="max-w-3xl mx-auto px-4 py-6 space-y-4">
-    <!-- Rows -->
     <div id="list" class="space-y-3"></div>
 
-    <!-- Transport + status -->
     <div class="flex items-center gap-3 pt-4">
       <button id="stopAll" class="pill px-4 py-2 rounded font-medium">Stop</button>
       <span id="nowPlaying" class="text-sm text-gray-600">Idle</span>
     </div>
   </main>
 
-  <!-- Single shared audio element -->
   <audio id="player" preload="none"></audio>
 
   <script>
-    // 1) Audio file URLs (keep naming simple)
-    //    Put these files next to this HTML (or update paths).
+    // Audio file URLs (simple naming)
     const AUDIO_URLS = {
       disputeTransaction: "./01_disputeTransaction.wav",
       customerNumber: "./02_customerNumber.wav",
@@ -69,10 +64,12 @@
       yes: "./21_yes.wav",
       no: "./22_no.wav",
       concernedPersonalMatterSpeakToSomeone: "./23_concernedPersonalMatterSpeakToSomeone.wav",
-      thankYou: "./24_thankYou.wav"
+      thankYou: "./24_thankYou.wav",
+      bankNorwegian: "./25_bankNorwegian.wav",
+      nordaxBank: "./26_nordaxBank.wav"
     };
 
-    // 2) Content (English + Swedish) — kept in your exact order
+    // Content (English + Swedish) — kept in order + new items appended
     const ROWS = [
       {
         key: "disputeTransaction",
@@ -193,6 +190,16 @@
         key: "thankYou",
         en: "Thank you",
         sv: "Tack."
+      },
+      {
+        key: "bankNorwegian",
+        en: "Bank Norwegian",
+        sv: "Bank Norwegian."
+      },
+      {
+        key: "nordaxBank",
+        en: "Nordax Bank",
+        sv: "Nordax Bank."
       }
     ];
 
